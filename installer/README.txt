@@ -1,4 +1,4 @@
-PK Trainer - House of Legacy  (v1.2.0)
+PK Trainer - House of Legacy  (v1.2.1)
 =======================================
 
 [ภาษาไทย]
@@ -11,7 +11,6 @@ PK Trainer - House of Legacy  (v1.2.0)
   อักษร, ยุทธ์, การค้า, ศิลป์, กลยุทธ์
 - เปลี่ยนชื่อตระกูล ชื่อตัวเอง และชื่อตัวละครอื่น
 - ค้นหาคน: กรอง เพศ/อายุ/ชนชั้น ให้คะแนนจากค่าพลังที่ปรับน้ำหนักได้ (จ้างงาน/แต่งงาน ฯลฯ)
-  และเปิดหน้าตัวละครของเกมของคนในเมืองได้เลย
 - สลับภาษา ไทย / EN ได้ในหน้าต่าง
 
 วิธีติดตั้ง (ง่ายที่สุด)
@@ -53,8 +52,7 @@ Features
 - Characters (Lineage, Spouse, Retainer): Age, Health, Mood, Renown, Charisma, Luck,
   Writing, Might, Business, Arts, Cunning
 - Rename family, yourself and any other character
-- People Finder: filter by gender/age/class, score by adjustable stat weights (hire / marriage ...),
-  and open the game's own profile page for people in the current city
+- People Finder: filter by gender/age/class, score by adjustable stat weights (hire / marriage ...)
 - Thai / EN language switch inside the window
 
 Install (easiest)

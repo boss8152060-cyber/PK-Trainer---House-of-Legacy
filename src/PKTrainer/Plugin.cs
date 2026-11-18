@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 namespace PKTrainer
 {
     /// <summary>PK Trainer - House of Legacy: Insert / F9 / ปุ่มมุมซ้ายล่าง เพื่อเปิด-ปิดหน้าต่าง แก้ค่าในเกมที่กำลังรันได้ทันที</summary>
-    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.2.0")]
+    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.2.1")]
     public partial class Plugin : BaseUnityPlugin
     {
         const string Title = "PK Trainer - House of Legacy";
@@ -77,32 +77,45 @@ namespace PKTrainer
             Logger.LogInfo(Title + " loaded. Insert / F9 / button at bottom-left");
         }
 
-        void OnDestroy() { Logger.LogWarning(Title + " object destroyed"); }
+        void OnDestroy() { ReleaseUi(); Logger.LogWarning(Title + " object destroyed"); }
 
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Insert) || Input.GetKeyDown(KeyCode.F9)) show = !show;
 
-            // กันคลิกทะลุ: ปิดการรับเมาส์ของ UI เกมชั่วคราวขณะเมาส์อยู่บนหน้าต่างของเรา
+            // กันคลิก/ซูมทะลุ: ขณะเมาส์อยู่บนหน้าต่างของเรา ปิด EventSystem ของเกมและห้ามกล้องขยับ
             var mp = Input.mousePosition;
             var g = new Vector2(mp.x, Screen.height - mp.y);
             bool over = (show && win.Contains(g)) || new Rect(6, Screen.height - 30, 120, 24).Contains(g);
-            var es = EventSystem.current;
-            if (es != null)
+            if (over)
             {
-                if (over && es.enabled) { es.enabled = false; uiBlocked = true; }
-                else if (!over && uiBlocked) { es.enabled = true; uiBlocked = false; }
+                if (!hovering) { hovering = true; prevCamMove = Mainload.isCanMoveCamera; }
+                Mainload.isCanMoveCamera = false;
+                if (blockedEs == null)
+                {
+                    var es = EventSystem.current;
+                    if (es != null && es.enabled) { es.enabled = false; blockedEs = es; }
+                }
             }
-            else uiBlocked = false;
-
-            // การ์ดตัวละครที่โคลนมา: ปิดเมื่อเกมล้างตัวแปรชี้ตัวละครแล้ว
-            if (cardGo != null && cardPerson != null && cardPerson.StillOpen != null && !cardPerson.StillOpen())
+            else if (hovering)
             {
-                Destroy(cardGo); cardGo = null; cardPerson = null;
+                hovering = false;
+                Mainload.isCanMoveCamera = prevCamMove;
+                ReleaseUi();
             }
         }
 
-        bool uiBlocked;
+        bool hovering, prevCamMove;
+        EventSystem blockedEs;
+
+        // หมายเหตุ: ตอนปิด EventSystem แล้ว EventSystem.current จะกลายเป็น null จึงต้องจำตัวที่ปิดไว้เอง
+        void ReleaseUi()
+        {
+            if (blockedEs != null) blockedEs.enabled = true;
+            blockedEs = null;
+        }
+
+        void OnDisable() { ReleaseUi(); }
 
         void OnGUI()
         {
@@ -118,6 +131,9 @@ namespace PKTrainer
         void BuildSkin()
         {
             skin = Instantiate(GUI.skin);
+            skin.hideFlags = HideFlags.HideAndDontSave;
+            skin.window.normal.textColor = Color.white;
+            skin.window.onNormal.textColor = Color.white;
             Font f = null;
             try { f = Font.CreateDynamicFontFromOSFont(new[] { "Tahoma", "Leelawadee UI", "Segoe UI", "Arial" }, 15); } catch { }
             if (f != null)
@@ -126,6 +142,19 @@ namespace PKTrainer
                 foreach (var s in new[] { skin.label, skin.button, skin.textField, skin.window, skin.box, skin.toggle })
                 { s.font = f; s.fontSize = 15; }
             }
+        }
+
+        // เลื่อนรายการด้วยล้อเมาส์ (กันกรณี ScrollView ไม่รับล้อ)
+        static Vector2 WheelScroll(Vector2 sc)
+        {
+            var r = GUILayoutUtility.GetLastRect();
+            var e = Event.current;
+            if (e.type == EventType.ScrollWheel && r.Contains(e.mousePosition))
+            {
+                sc.y += e.delta.y * 24f;
+                e.Use();
+            }
+            return sc;
         }
 
         void SetLang(bool thai)
@@ -332,6 +361,7 @@ namespace PKTrainer
                 }
             }
             GUILayout.EndScrollView();
+            scroll = WheelScroll(scroll);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();

@@ -1,12 +1,12 @@
 # Build PK Trainer and create the release zip in dist\
-# Usage: powershell -ExecutionPolicy Bypass -File tools\package.ps1 [-GameDir "<game folder>"] [-Version 1.1.0]
+# Usage: powershell -ExecutionPolicy Bypass -File tools\package.ps1 [-GameDir "<game folder>"] [-Version 1.2.1]
 #
 # BepInEx files are copied from your own game folder (it must already have BepInEx 5.x installed),
 # or from -BepInExDir if you point to an extracted BepInEx_x64 release.
 param(
     [string]$GameDir = '',
     [string]$BepInExDir = '',
-    [string]$Version = '1.2.0'
+    [string]$Version = '1.2.1'
 )
 $ErrorActionPreference = 'Stop'
 if (-not $GameDir) {

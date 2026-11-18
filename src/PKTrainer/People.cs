@@ -18,11 +18,6 @@ namespace PKTrainer
             public int ClassId;      // 0 commoner, 1 official, 2 titled noble, 3 clan daughter, 4 courtesan
             public float Age, W, M, B, A, C, Mood, Charisma, Stamina, Renown, Luck;
             public float Score;
-            public Type Panel;                 // คลาสของหน้าข้อมูลในเกม
-            public Action SetVars, ResetVars;  // ตั้ง/ล้างตัวแปร Mainload.*_Enter
-            public Func<bool> StillOpen;       // ตัวแปรยังชี้ที่คนนี้อยู่ไหม
-            public List<string> Raw;           // แถวข้อมูลดิบ (คนในเมือง)
-            public Func<string> Check;         // คืนข้อความเตือนถ้าเปิดไม่ได้
         }
 
         static float F(string s)
@@ -35,7 +30,6 @@ namespace PKTrainer
 
         static string[] Blk(string s) { return (s ?? "").Split('|'); }
 
-        static Vector3 Center() { return new Vector3(Screen.width * 0.5f, Screen.height * 0.55f, 0f); }
 
         static string ClanName(int a)
         {
@@ -74,7 +68,6 @@ namespace PKTrainer
                     {
                         if (m == null || m.Count < 23) continue;
                         var p = FromClanLayout(m, "city");
-                        p.Raw = m;
                         res.Add(p);
                     }
 
@@ -83,12 +76,7 @@ namespace PKTrainer
                     for (int i = 0; i < hm.Count; i++)
                     {
                         var m = hm[i]; if (m == null || m.Count < 23) continue;
-                        int idx = i;
                         var p = FromClanLayout(m, "scholar");
-                        p.Panel = typeof(MemberHanMenInfoPanel);
-                        p.SetVars = () => { Mainload.MemberHanMenIndex_Enter = idx; Mainload.MemberHanMenInfoPanelPosi = Center(); };
-                        p.ResetVars = () => { Mainload.MemberHanMenIndex_Enter = -1; };
-                        p.StillOpen = () => Mainload.MemberHanMenIndex_Enter == idx;
                         res.Add(p);
                     }
 
@@ -98,13 +86,8 @@ namespace PKTrainer
                         for (int bi = 0; bi < mo[a].Count; bi++)
                         {
                             var m = mo[a][bi]; if (m == null || m.Count < 23) continue;
-                            int ia = a, ib = bi;
                             var p = FromClanLayout(m, "clanman");
                             p.ClanLabel = ClanName(a);
-                            p.Panel = typeof(MemberShijiaInfoPanel);
-                            p.SetVars = () => { Mainload.MemberShijiaIndex_Enter = ia + "|" + ib; Mainload.MemberShijiaInfoPanelPosi = Center(); };
-                            p.ResetVars = () => { Mainload.MemberShijiaIndex_Enter = "null"; };
-                            p.StillOpen = () => Mainload.MemberShijiaIndex_Enter == ia + "|" + ib;
                             res.Add(p);
                         }
 
@@ -114,7 +97,6 @@ namespace PKTrainer
                         for (int bi = 0; bi < mq[a].Count; bi++)
                         {
                             var m = mq[a][bi]; if (m == null || m.Count < 18) continue;
-                            int ia = a, ib = bi;
                             var b = Blk(At(m, 2));
                             var p = new Person { Src = "clanwoman", Id = m[0], Name = b[0], Female = true, ClassId = 3, ClanLabel = ClanName(a) };
                             p.Luck = b.Length > 7 ? F(b[7]) : 0;
@@ -122,10 +104,6 @@ namespace PKTrainer
                             p.W = F(At(m, 4)); p.M = F(At(m, 5)); p.B = F(At(m, 6)); p.A = F(At(m, 7));
                             p.Mood = F(At(m, 8)); p.Renown = F(At(m, 10));
                             p.Charisma = F(At(m, 15)); p.Stamina = F(At(m, 16)); p.C = F(At(m, 17));
-                            p.Panel = typeof(MemberShijiaQuInfoPanel);
-                            p.SetVars = () => { Mainload.MemberShijiaQuIndex_Enter = ia + "|" + ib; Mainload.MemberShijiaQuInfoPanelPosi = Center(); };
-                            p.ResetVars = () => { Mainload.MemberShijiaQuIndex_Enter = "null"; };
-                            p.StillOpen = () => Mainload.MemberShijiaQuIndex_Enter == ia + "|" + ib;
                             res.Add(p);
                         }
 
@@ -135,18 +113,12 @@ namespace PKTrainer
                         for (int i = 0; i < ql[c].Count; i++)
                         {
                             var m = ql[c][i]; if (m == null || m.Count < 12) continue;
-                            int ic = c, ii = i;
                             var b = Blk(At(m, 3));
                             var p = new Person { Src = "qinglou", Id = m[1], Name = b[0], Female = true, ClassId = 4, ClanLabel = "#" + c };
                             p.Luck = b.Length > 7 ? F(b[7]) : 0;
                             p.Age = F(At(m, 4));
                             p.W = F(At(m, 5)); p.M = F(At(m, 6)); p.B = F(At(m, 7)); p.A = F(At(m, 8));
                             p.Charisma = F(At(m, 10)); p.Stamina = F(At(m, 11));
-                            p.Panel = typeof(MemberQingLouInfoPanel);
-                            p.SetVars = () => { Mainload.MemberQingLouIndex_Enter = ii; Mainload.MemberQingLouInfoPanelPosi = Center(); };
-                            p.ResetVars = () => { Mainload.MemberQingLouIndex_Enter = -1; };
-                            p.StillOpen = () => Mainload.MemberQingLouIndex_Enter == ii;
-                            p.Check = () => SceneCity() == ic ? null : L("Qinglou people can only be shown while you are in that city.", "ดูคนชิงโหลวได้เฉพาะตอนอยู่ในเมืองนั้น");
                             res.Add(p);
                         }
             }
@@ -168,7 +140,6 @@ namespace PKTrainer
         Vector2 finderScroll;
         // น้ำหนัก: Writing, Might, Business, Arts, Cunning, Charisma, Luck
         readonly float[] wts = { 1, 1, 1, 1, 1, 0, 0 };
-        string finderMsg = "";
 
         static readonly string[] SrcEn = { "In this city", "Scholars", "Clan men", "Clan women", "Qinglou" };
         static readonly string[] SrcTh = { "คนในเมืองนี้", "นักปราชญ์", "ชายตระกูลอื่น", "หญิงตระกูลอื่น", "ชิงโหลว" };
@@ -316,6 +287,7 @@ namespace PKTrainer
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();
+            finderScroll = WheelScroll(finderScroll);
             GUILayout.Label(view.Count + " / " + people.Count + L(" people", " คน"));
             GUILayout.EndVertical();
 
@@ -358,81 +330,10 @@ namespace PKTrainer
                 GUILayout.Label(L("Cunning ", "กลยุทธ์ ") + cur.C.ToString("0.0") + "   " + L("Charisma ", "เสน่ห์ ") + cur.Charisma.ToString("0.0"));
                 GUILayout.Label(L("Luck ", "โชค ") + cur.Luck.ToString("0") + "   " + L("Mood ", "อารมณ์ ") + cur.Mood.ToString("0") + "   " + L("Renown ", "ชื่อเสียง ") + cur.Renown.ToString("0"));
                 GUILayout.Label(L("Score: ", "คะแนน: ") + cur.Score.ToString("0.0"));
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(L("Open profile", "เปิดหน้าตัวละคร"))) finderMsg = OpenCard(cur);
-                if (GUILayout.Button(L("Close card", "ปิดการ์ด"), GUILayout.Width(90))) CloseCard();
-                GUILayout.EndHorizontal();
-                GUILayout.Label(finderMsg);
             }
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
-        }
-
-        // ------------------------------------------------ การ์ดข้อมูลตัวละคร
-        GameObject cardGo;
-        Person cardPerson;
-
-        static int SceneCity()
-        {
-            try { return int.Parse(Mainload.SceneID.Split('|')[1]); } catch { return -999; }
-        }
-
-        void CloseCard()
-        {
-            if (cardGo != null) Destroy(cardGo);
-            cardGo = null;
-            if (cardPerson != null) { try { cardPerson.ResetVars(); } catch { } }
-            cardPerson = null;
-        }
-
-        /// <summary>โคลนหน้าข้อมูลตัวละครของเกมมาวางบน Canvas หลัก แล้วให้มันอ่านดัชนีที่เราตั้งไว้</summary>
-        string OpenCard(Person p)
-        {
-            try
-            {
-                CloseCard();
-                if (p.Src == "city") return OpenCityPerson(p);
-                if (p.Check != null) { var w = p.Check(); if (w != null) return w; }
-                p.SetVars();
-                cardPerson = p;
-
-                Component src = null;
-                foreach (var o in Resources.FindObjectsOfTypeAll(p.Panel))
-                {
-                    var c = o as Component;
-                    if (c != null && c.gameObject.scene.IsValid()) { src = c; break; }
-                }
-                if (src == null) return L("Card not found in this screen.", "ไม่พบหน้าการ์ดในฉากนี้");
-
-                // ถ้ามีหน้าจอเกมที่เป็นแม่ของการ์ดนี้เปิดอยู่ เกมจะแสดงการ์ดเอง
-                if (src.transform.parent != null && src.transform.parent.gameObject.activeInHierarchy)
-                    return L("Shown by the open game screen.", "แสดงในหน้าจอเกมที่เปิดอยู่แล้ว");
-
-                Canvas root = null;
-                for (var tr = src.transform; tr != null; tr = tr.parent)
-                {
-                    var cv = tr.GetComponent<Canvas>();
-                    if (cv != null) root = cv.rootCanvas;
-                }
-                if (root == null) return L("No canvas found.", "ไม่พบ Canvas");
-
-                var go = Instantiate(src.gameObject, root.transform, false);
-                go.name = "PKCard";
-                go.SetActive(false);
-                var rt = go.GetComponent<RectTransform>();
-                if (root.renderMode == RenderMode.ScreenSpaceOverlay) rt.position = Center();
-                else { rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f); rt.anchoredPosition = Vector2.zero; }
-                go.transform.SetAsLastSibling();
-                go.SetActive(true);
-                cardGo = go;
-                return L("Card shown. Press Close card (or open another) to dismiss.", "แสดงการ์ดแล้ว กด ปิดการ์ด เพื่อปิด");
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e);
-                return "Error: " + e.Message;
-            }
         }
 
         static int SrcIndex(Person p)
@@ -445,32 +346,6 @@ namespace PKTrainer
                 case "clanwoman": return 3;
                 default: return 4;
             }
-        }
-
-        // เปิดหน้าของเกม (PerMemberHanMenPanel: อภิเษกสมรส/จ้างเป็นที่ปรึกษา/...) เหมือนที่คลิกคนเดินในเมือง
-        string OpenCityPerson(Person p)
-        {
-            if (p.Raw == null) return "-";
-            if (Mainload.HanMen_City == null || !Mainload.HanMen_City.Contains(p.Raw))
-                return L("This person has left the screen.", "คนนี้ออกจากฉากไปแล้ว");
-            if (Mainload.isMemberHanMenPanelOpen)
-            {
-                Mainload.isMemberHanMenPanelOpen = false;       // ปิดก่อนแล้วเปิดใหม่ให้โหลดข้อมูลคนใหม่
-                StartCoroutine(ReopenCityPerson(p.Raw));
-            }
-            else
-            {
-                Mainload.HanMenMemberData_Click = p.Raw;
-                Mainload.isMemberHanMenPanelOpen = true;
-            }
-            return L("Opened the game's profile page.", "เปิดหน้าตัวละครของเกมแล้ว");
-        }
-
-        System.Collections.IEnumerator ReopenCityPerson(List<string> raw)
-        {
-            yield return new WaitForSecondsRealtime(0.2f);
-            Mainload.HanMenMemberData_Click = raw;
-            Mainload.isMemberHanMenPanelOpen = true;
         }
 
         string SrcName(int i) { return th ? SrcTh[i] : SrcEn[i]; }

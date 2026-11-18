@@ -4,12 +4,13 @@ using System.Globalization;
 using BepInEx;
 using BepInEx.Configuration;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace PKTrainer
 {
     /// <summary>PK Trainer - House of Legacy: Insert / F9 / ปุ่มมุมซ้ายล่าง เพื่อเปิด-ปิดหน้าต่าง แก้ค่าในเกมที่กำลังรันได้ทันที</summary>
-    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.1.0")]
-    public class Plugin : BaseUnityPlugin
+    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.2.0")]
+    public partial class Plugin : BaseUnityPlugin
     {
         const string Title = "PK Trainer - House of Legacy";
 
@@ -51,7 +52,7 @@ namespace PKTrainer
         ConfigEntry<bool> cfgThai;
         bool th = true;
         bool show;
-        Rect win = new Rect(40, 40, 780, 580);
+        Rect win = new Rect(30, 30, 1090, 700);
         int tab;
         string amtCoin = "100000", amtGold = "100", amtSlave = "10", amtRenown = "100";
         int filter; // 0 = all
@@ -81,7 +82,27 @@ namespace PKTrainer
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Insert) || Input.GetKeyDown(KeyCode.F9)) show = !show;
+
+            // กันคลิกทะลุ: ปิดการรับเมาส์ของ UI เกมชั่วคราวขณะเมาส์อยู่บนหน้าต่างของเรา
+            var mp = Input.mousePosition;
+            var g = new Vector2(mp.x, Screen.height - mp.y);
+            bool over = (show && win.Contains(g)) || new Rect(6, Screen.height - 30, 120, 24).Contains(g);
+            var es = EventSystem.current;
+            if (es != null)
+            {
+                if (over && es.enabled) { es.enabled = false; uiBlocked = true; }
+                else if (!over && uiBlocked) { es.enabled = true; uiBlocked = false; }
+            }
+            else uiBlocked = false;
+
+            // การ์ดตัวละครที่โคลนมา: ปิดเมื่อเกมล้างตัวแปรชี้ตัวละครแล้ว
+            if (cardGo != null && cardPerson != null && cardPerson.StillOpen != null && !cardPerson.StillOpen())
+            {
+                Destroy(cardGo); cardGo = null; cardPerson = null;
+            }
         }
+
+        bool uiBlocked;
 
         void OnGUI()
         {
@@ -119,6 +140,7 @@ namespace PKTrainer
             GUILayout.BeginHorizontal();
             if (GUILayout.Toggle(tab == 0, L("Player", "ผู้เล่น"), "Button", GUILayout.Width(110))) tab = 0;
             if (GUILayout.Toggle(tab == 1, L("Characters", "ตัวละคร"), "Button", GUILayout.Width(110))) tab = 1;
+            if (GUILayout.Toggle(tab == 2, L("People Finder", "ค้นหาคน"), "Button", GUILayout.Width(130))) tab = 2;
             GUILayout.FlexibleSpace();
             if (GUILayout.Toggle(th, "ไทย", "Button", GUILayout.Width(60)) && !th) SetLang(true);
             if (GUILayout.Toggle(!th, "EN", "Button", GUILayout.Width(60)) && th) SetLang(false);
@@ -132,7 +154,7 @@ namespace PKTrainer
             {
                 try
                 {
-                    if (tab == 0) DrawPlayer(); else DrawChars();
+                    if (tab == 0) DrawPlayer(); else if (tab == 1) DrawChars(); else DrawFinder();
                 }
                 catch (Exception e) { status = "Error: " + e.Message; Logger.LogError(e); }
             }
@@ -190,7 +212,29 @@ namespace PKTrainer
             if (GUILayout.Button(L("Coin = 999,999,999", "เหรียญ = 999,999,999"))) { SetCoins(999999999); status = L("Coin = 999,999,999", "เหรียญ = 999,999,999"); }
             if (GUILayout.Button(L("Gold = 99,999", "ทอง = 99,999"))) { Mainload.CGNum[1] = "99999"; status = L("Gold = 99,999", "ทอง = 99,999"); }
             GUILayout.EndHorizontal();
+
+            // ---- เปลี่ยนชื่อ
+            GUILayout.Space(14);
+            GUILayout.Label(L("Names", "ชื่อ"));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(L("Family name", "ชื่อตระกูล"), GUILayout.Width(110));
+            GUILayout.Label(Mainload.FamilyData[1], GUILayout.Width(130));
+            famBuf = GUILayout.TextField(famBuf ?? "", GUILayout.Width(180));
+            if (GUILayout.Button(L("Rename", "เปลี่ยนชื่อ"), GUILayout.Width(110))) status = RenameFamily(famBuf);
+            GUILayout.EndHorizontal();
+
+            var fe = FounderEntry();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(L("Founder name", "ชื่อตัวเอง"), GUILayout.Width(110));
+            GUILayout.Label(fe == null ? "-" : Name(fe.G, fe.M), GUILayout.Width(130));
+            founderBuf = GUILayout.TextField(founderBuf ?? "", GUILayout.Width(180));
+            if (GUILayout.Button(L("Rename", "เปลี่ยนชื่อ"), GUILayout.Width(110)) && fe != null) status = RenameMember(fe.G, fe.M, founderBuf);
+            GUILayout.EndHorizontal();
+            GUILayout.Label(L("Tip: any other person can be renamed in the Characters tab. Reopen the info panel to see the new name.",
+                              "เคล็ดลับ: คนอื่นเปลี่ยนชื่อได้ในแท็บตัวละคร เปิดหน้าข้อมูลใหม่เพื่อดูชื่อที่เปลี่ยน"));
         }
+
+        string famBuf, founderBuf, nameBuf;
 
         // -------------------------------------------------------- Characters
         class Entry { public Group G; public List<string> M; }
@@ -259,6 +303,7 @@ namespace PKTrainer
         void LoadBuf(Group g, List<string> m)
         {
             foreach (var fl in Fields) buf[fl.Id] = Fmt(Get(g, m, fl.Id));
+            nameBuf = Name(g, m);
         }
 
         void DrawChars()
@@ -299,6 +344,15 @@ namespace PKTrainer
             else
             {
                 GUILayout.Label(Name(cur.G, cur.M) + "  [" + (th ? cur.G.Th : cur.G.En) + "]  id " + cur.M[0]);
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(L("Name", "ชื่อ"), GUILayout.Width(90));
+                nameBuf = GUILayout.TextField(nameBuf ?? "", GUILayout.Width(210));
+                if (GUILayout.Button(L("Rename", "เปลี่ยนชื่อ"), GUILayout.Width(100)))
+                {
+                    status = RenameMember(cur.G, cur.M, nameBuf);
+                    LoadBuf(cur.G, cur.M);
+                }
+                GUILayout.EndHorizontal();
                 foreach (var fl in Fields)
                 {
                     GUILayout.BeginHorizontal();

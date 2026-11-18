@@ -83,7 +83,7 @@ try {
     }
 
     $files = Join-Path $PSScriptRoot 'files'
-    if (-not (Test-Path -LiteralPath $files)) { throw "Folder 'files' not found next to the installer. Extract the whole zip first." }
+    if (-not (Test-Path -LiteralPath $files)) { throw "Folder 'files' not found next to Install.bat. Right-click the release zip > Extract All, then run Install.bat from the EXTRACTED folder (not from inside the zip, and not from the source repo)." }
 
     $hasBepInEx = Test-Path -LiteralPath (Join-Path $game 'BepInEx\core\BepInEx.dll')
     if ($hasBepInEx) {

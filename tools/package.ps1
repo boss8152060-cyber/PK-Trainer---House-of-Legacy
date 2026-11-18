@@ -6,7 +6,7 @@
 param(
     [string]$GameDir = '',
     [string]$BepInExDir = '',
-    [string]$Version = '1.1.0'
+    [string]$Version = '1.2.0'
 )
 $ErrorActionPreference = 'Stop'
 if (-not $GameDir) {

@@ -10,6 +10,8 @@ It runs as a [BepInEx](https://github.com/BepInEx/BepInEx) plugin and edits valu
 - **Player:** Coin, Gold, Slaves, Renown — set / add / subtract
 - **Characters** (Lineage, Spouse, Retainer): Age, Health, Mood, Renown, Charisma, Luck, Writing, Might, Business, Arts, Cunning
 - One-click helpers: Health + Mood = 100, set all skills
+- Rename the family, yourself and any other character
+- **People Finder:** filter people (in the current city, scholars, other clans, Qinglou) by gender, age and class, rank them with adjustable stat weights (hire / marriage presets), and open the game's own profile page
 - Thai / English switch (remembered between sessions)
 
 ## Install

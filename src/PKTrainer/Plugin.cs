@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 namespace PKTrainer
 {
     /// <summary>PK Trainer - House of Legacy: Insert / F9 / ปุ่มมุมซ้ายล่าง เพื่อเปิด-ปิดหน้าต่าง แก้ค่าในเกมที่กำลังรันได้ทันที</summary>
-    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.2.1")]
+    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.3.0")]
     public partial class Plugin : BaseUnityPlugin
     {
         const string Title = "PK Trainer - House of Legacy";
@@ -52,7 +52,7 @@ namespace PKTrainer
         ConfigEntry<bool> cfgThai;
         bool th = true;
         bool show;
-        Rect win = new Rect(30, 30, 1090, 700);
+        Rect win = new Rect(30, 30, 800, 600);
         int tab;
         string amtCoin = "100000", amtGold = "100", amtSlave = "10", amtRenown = "100";
         int filter; // 0 = all
@@ -169,7 +169,6 @@ namespace PKTrainer
             GUILayout.BeginHorizontal();
             if (GUILayout.Toggle(tab == 0, L("Player", "ผู้เล่น"), "Button", GUILayout.Width(110))) tab = 0;
             if (GUILayout.Toggle(tab == 1, L("Characters", "ตัวละคร"), "Button", GUILayout.Width(110))) tab = 1;
-            if (GUILayout.Toggle(tab == 2, L("People Finder", "ค้นหาคน"), "Button", GUILayout.Width(130))) tab = 2;
             GUILayout.FlexibleSpace();
             if (GUILayout.Toggle(th, "ไทย", "Button", GUILayout.Width(60)) && !th) SetLang(true);
             if (GUILayout.Toggle(!th, "EN", "Button", GUILayout.Width(60)) && th) SetLang(false);
@@ -183,7 +182,7 @@ namespace PKTrainer
             {
                 try
                 {
-                    if (tab == 0) DrawPlayer(); else if (tab == 1) DrawChars(); else DrawFinder();
+                    if (tab == 0) DrawPlayer(); else DrawChars();
                 }
                 catch (Exception e) { status = "Error: " + e.Message; Logger.LogError(e); }
             }

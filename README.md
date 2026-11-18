@@ -16,7 +16,7 @@ It runs as a [BepInEx](https://github.com/BepInEx/BepInEx) plugin and edits valu
 
 ## Install
 
-1. Download the latest zip from **Releases** and **extract it**.
+1. Download [`PK Trainer - House of Legacy v1.2.1.zip`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.2.1.zip) (in the `releases/` folder; also on the **Releases** page if published) and **extract it**.
 2. Close the game, then double-click **`Install.bat`**.
    It finds your Steam game folder automatically (or asks you to pick it) and installs BepInEx + the plugin
    (or just the plugin if BepInEx 5 is already there).
@@ -54,7 +54,7 @@ Unofficial fan-made tool; not affiliated with the game's developers.
 ## ภาษาไทย
 
 **ติดตั้ง**
-1. ดาวน์โหลด zip ล่าสุดจากหน้า **Releases** แล้ว **แตกไฟล์**
+1. ดาวน์โหลดไฟล์ zip จากโฟลเดอร์ [`releases/`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.2.1.zip) (หรือหน้า **Releases**) แล้ว **แตกไฟล์**
 2. ปิดเกมให้หมด แล้วดับเบิลคลิก **`Install.bat`** (หาโฟลเดอร์เกมจาก Steam ให้เอง ถ้าหาไม่เจอจะให้เลือกเอง)
 3. เปิดเกม โหลด save แล้วกด **Insert** / **F9** หรือคลิกปุ่ม **PK Trainer [Ins]** มุมซ้ายล่างของจอ
 

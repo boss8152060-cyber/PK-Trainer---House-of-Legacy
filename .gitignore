@@ -1,0 +1,10 @@
+# build output
+bin/
+obj/
+dist/
+
+# personal save backups - never commit
+Backups/
+*.es3
+
+.vs/

@@ -8,3 +8,7 @@ Backups/
 *.es3
 
 .vs/
+
+# editor/script backups and local-only files
+*.bak
+tools/order-form.html

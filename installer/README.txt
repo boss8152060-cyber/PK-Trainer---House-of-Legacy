@@ -1,4 +1,4 @@
-PK Trainer - House of Legacy  (v1.3.0)
+﻿PK Trainer - House of Legacy  (v1.4.0)
 =======================================
 
 [ภาษาไทย]

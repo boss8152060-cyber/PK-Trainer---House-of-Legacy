@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 namespace PKTrainer
 {
     /// <summary>PK Trainer - House of Legacy: Insert / F9 / ปุ่มมุมซ้ายล่าง เพื่อเปิด-ปิดหน้าต่าง แก้ค่าในเกมที่กำลังรันได้ทันที</summary>
-    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.3.0")]
+    [BepInPlugin("pk.hol.trainer", "PK Trainer - House of Legacy", "1.4.0")]
     public partial class Plugin : BaseUnityPlugin
     {
         const string Title = "PK Trainer - House of Legacy";

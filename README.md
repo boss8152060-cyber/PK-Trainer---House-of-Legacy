@@ -11,11 +11,14 @@ It runs as a [BepInEx](https://github.com/BepInEx/BepInEx) plugin and edits valu
 - **Characters** (Lineage, Spouse, Retainer): Age, Health, Mood, Renown, Charisma, Luck, Writing, Might, Business, Arts, Cunning
 - One-click helpers: Health + Mood = 100, set all skills
 - Rename the family, yourself and any other character
+- **Marriage / relationships**, **Talent** browser (sort / filter by sex), **Items** and inventory editor
+- **Horses** (stable slots), **Farm** tools, **Map** tools: import blueprint files, move rooms
+- **Mirror** (press `F` while placing a building to flip it)
 - Thai / English switch (remembered between sessions)
 
 ## Install
 
-1. Download [`PK Trainer - House of Legacy v1.3.0.zip`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.3.0.zip) (in the `releases/` folder; also on the **Releases** page if published) and **extract it**.
+1. Download [`PK Trainer - House of Legacy v1.4.0.zip`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.4.0.zip) (in the `releases/` folder; also on the **Releases** page if published) and **extract it**.
 2. Close the game, then double-click **`Install.bat`**.
    It finds your Steam game folder automatically (or asks you to pick it) and installs BepInEx + the plugin
    (or just the plugin if BepInEx 5 is already there).
@@ -53,7 +56,7 @@ Unofficial fan-made tool; not affiliated with the game's developers.
 ## ภาษาไทย
 
 **ติดตั้ง**
-1. ดาวน์โหลดไฟล์ zip จากโฟลเดอร์ [`releases/`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.3.0.zip) (หรือหน้า **Releases**) แล้ว **แตกไฟล์**
+1. ดาวน์โหลดไฟล์ zip จากโฟลเดอร์ [`releases/`](releases/PK%20Trainer%20-%20House%20of%20Legacy%20v1.4.0.zip) (หรือหน้า **Releases**) แล้ว **แตกไฟล์**
 2. ปิดเกมให้หมด แล้วดับเบิลคลิก **`Install.bat`** (หาโฟลเดอร์เกมจาก Steam ให้เอง ถ้าหาไม่เจอจะให้เลือกเอง)
 3. เปิดเกม โหลด save แล้วกด **Insert** / **F9** หรือคลิกปุ่ม **PK Trainer [Ins]** มุมซ้ายล่างของจอ
 
